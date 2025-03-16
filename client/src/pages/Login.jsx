@@ -1,6 +1,7 @@
 //ftpvLGhsP3HpAKUZ
 import { Button } from "@/components/ui/button"
-import { useState } from "react"
+import { useEffect, useState } from "react"
+
 import {
   Card,
   CardContent,
@@ -17,6 +18,9 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs"
+import { useLoginUserMutation, useRegisterUserMutation } from "@/features/api/authApi"
+import { Loader2 } from "lucide-react"
+import { toast } from "sonner"
 
 const Login = () => {
   const[signupInput, setSignupInput] = useState({
@@ -28,6 +32,10 @@ const Login = () => {
     email: "",
     password: "",
   });
+
+  const [registerUser,{data:registerData,error:registerError,isLoading:registerIsLoading, isSuccess:registerIsSuccess}] = useRegisterUserMutation();
+  const[loginUser,{data:loginData,error:loginError,isLoading:loginIsLoading, isSuccess:loginIsSuccess}] =useLoginUserMutation();
+
   const changeInputHandler = (e,type) => {
     const {name,value} = e.target;
     if(type === "signup"){
@@ -36,14 +44,28 @@ const Login = () => {
       setLoginInput({...loginInput, [name]: value});
   }};
 
-  const handleRegistration = (type) => {
-    if(type === "signup"){
-      console.log(signupInput);
+
+  const handleRegistration = async (type) => {
+    const inputData = type === "signup" ? signupInput : loginInput;
+    const action= type === "signup" ? registerUser : loginUser;
+    await action(inputData);
+  };
+
+  useEffect(() => {
+    if(registerIsSuccess && registerData){
+      toast.success(resgisterData.message || "Signup successful")
     }
-    else {
-      console.log(loginInput);
+    if(registerError){
+      toast.error(registerData.data.message || "Signup failed")
     }
-  }
+    if(loginIsSuccess && loginData){
+      toast.success(loginData.message || "Login successful")
+    }
+    if(loginError){
+      toast.error(loginData.data.message || "login failed")
+    }
+  },[loginIsLoading,registerIsLoading, loginData,registerData, loginError, registerError]);
+
   return (
     <div className="flex items-center w-full justify-center">
       <Tabs defaultValue="account" className="w-[400px]">
@@ -89,7 +111,15 @@ const Login = () => {
               </div>
             </CardContent>
             <CardFooter>
-              <Button onClick={()=>handleRegistration("signup")}>Signup</Button>
+
+              <Button disabled={registerIsLoading} onClick={()=>handleRegistration("signup")}>
+              {
+                  registerIsLoading ? (
+                    <> <Loader2 className="mr-2 h-4 w-4 animate-spin"/> Please wait </>
+                  ) : "Signup"
+                }
+              </Button>
+
             </CardFooter>
           </Card>
         </TabsContent>
@@ -122,7 +152,14 @@ const Login = () => {
               </div>
             </CardContent>
             <CardFooter>
-              <Button onClick={()=>handleRegistration("login")}>Login</Button>
+
+              <Button disabled={loginIsLoading} onClick={()=>handleRegistration("login")}>
+                {
+                  loginIsLoading ? (
+                    <> <Loader2 className="mr-2 h-4 w-4 animate-spin"/> Please wait </>
+                  ) : "Login"
+                }
+                </Button>
             </CardFooter>
           </Card>
         </TabsContent>
