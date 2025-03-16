@@ -1,6 +1,7 @@
 //ftpvLGhsP3HpAKUZ
 import { Button } from "@/components/ui/button"
 import { useEffect, useState } from "react"
+
 import {
   Card,
   CardContent,
@@ -34,6 +35,7 @@ const Login = () => {
 
   const [registerUser,{data:registerData,error:registerError,isLoading:registerIsLoading, isSuccess:registerIsSuccess}] = useRegisterUserMutation();
   const[loginUser,{data:loginData,error:loginError,isLoading:loginIsLoading, isSuccess:loginIsSuccess}] =useLoginUserMutation();
+
   const changeInputHandler = (e,type) => {
     const {name,value} = e.target;
     if(type === "signup"){
@@ -41,6 +43,7 @@ const Login = () => {
     } else {
       setLoginInput({...loginInput, [name]: value});
   }};
+
 
   const handleRegistration = async (type) => {
     const inputData = type === "signup" ? signupInput : loginInput;
@@ -62,6 +65,7 @@ const Login = () => {
       toast.error(loginData.data.message || "login failed")
     }
   },[loginIsLoading,registerIsLoading, loginData,registerData, loginError, registerError]);
+
   return (
     <div className="flex items-center w-full justify-center">
       <Tabs defaultValue="account" className="w-[400px]">
@@ -107,6 +111,7 @@ const Login = () => {
               </div>
             </CardContent>
             <CardFooter>
+
               <Button disabled={registerIsLoading} onClick={()=>handleRegistration("signup")}>
               {
                   registerIsLoading ? (
@@ -114,6 +119,7 @@ const Login = () => {
                   ) : "Signup"
                 }
               </Button>
+
             </CardFooter>
           </Card>
         </TabsContent>
@@ -146,6 +152,7 @@ const Login = () => {
               </div>
             </CardContent>
             <CardFooter>
+
               <Button disabled={loginIsLoading} onClick={()=>handleRegistration("login")}>
                 {
                   loginIsLoading ? (
