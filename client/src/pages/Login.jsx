@@ -1,4 +1,6 @@
+//ftpvLGhsP3HpAKUZ
 import { Button } from "@/components/ui/button"
+import { useEffect, useState } from "react"
 import {
   Card,
   CardContent,
@@ -15,61 +17,148 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs"
+import { useLoginUserMutation, useRegisterUserMutation } from "@/features/api/authApi"
+import { Loader2 } from "lucide-react"
+import { toast } from "sonner"
 
-const Login=()=> {
+const Login = () => {
+  const[signupInput, setSignupInput] = useState({
+    name: "",
+    email: "",
+    password: "",
+  });
+  const [loginInput, setLoginInput] = useState({
+    email: "",
+    password: "",
+  });
+
+  const [registerUser,{data:registerData,error:registerError,isLoading:registerIsLoading, isSuccess:registerIsSuccess}] = useRegisterUserMutation();
+  const[loginUser,{data:loginData,error:loginError,isLoading:loginIsLoading, isSuccess:loginIsSuccess}] =useLoginUserMutation();
+  const changeInputHandler = (e,type) => {
+    const {name,value} = e.target;
+    if(type === "signup"){
+      setSignupInput({...signupInput, [name]: value});
+    } else {
+      setLoginInput({...loginInput, [name]: value});
+  }};
+
+  const handleRegistration = async (type) => {
+    const inputData = type === "signup" ? signupInput : loginInput;
+    const action= type === "signup" ? registerUser : loginUser;
+    await action(inputData);
+  };
+
+  useEffect(() => {
+    if(registerIsSuccess && registerData){
+      toast.success(resgisterData.message || "Signup successful")
+    }
+    if(registerError){
+      toast.error(registerData.data.message || "Signup failed")
+    }
+    if(loginIsSuccess && loginData){
+      toast.success(loginData.message || "Login successful")
+    }
+    if(loginError){
+      toast.error(loginData.data.message || "login failed")
+    }
+  },[loginIsLoading,registerIsLoading, loginData,registerData, loginError, registerError]);
   return (
-    <Tabs defaultValue="account" className="w-[400px]">
-      <TabsList className="grid w-full grid-cols-2">
-        <TabsTrigger value="account">Account</TabsTrigger>
-        <TabsTrigger value="password">Password</TabsTrigger>
-      </TabsList>
-      <TabsContent value="account">
-        <Card>
-          <CardHeader>
-            <CardTitle>Account</CardTitle>
-            <CardDescription>
-              Make changes to your account here. Click save when you're done.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            <div className="space-y-1">
-              <Label htmlFor="name">Name</Label>
-              <Input id="name" defaultValue="Pedro Duarte" />
-            </div>
-            <div className="space-y-1">
-              <Label htmlFor="username">Username</Label>
-              <Input id="username" defaultValue="@peduarte" />
-            </div>
-          </CardContent>
-          <CardFooter>
-            <Button>Save changes</Button>
-          </CardFooter>
-        </Card>
-      </TabsContent>
-      <TabsContent value="password">
-        <Card>
-          <CardHeader>
-            <CardTitle>Password</CardTitle>
-            <CardDescription>
-              Change your password here. After saving, you'll be logged out.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            <div className="space-y-1">
-              <Label htmlFor="current">Current password</Label>
-              <Input id="current" type="password" />
-            </div>
-            <div className="space-y-1">
-              <Label htmlFor="new">New password</Label>
-              <Input id="new" type="password" />
-            </div>
-          </CardContent>
-          <CardFooter>
-            <Button>Save password</Button>
-          </CardFooter>
-        </Card>
-      </TabsContent>
-    </Tabs>
+    <div className="flex items-center w-full justify-center">
+      <Tabs defaultValue="account" className="w-[400px]">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="signup">Signup</TabsTrigger>
+          <TabsTrigger value="login">Login</TabsTrigger>
+        </TabsList>
+        <TabsContent value="signup">
+          <Card>
+            <CardHeader>
+              <CardTitle>Signup</CardTitle>
+              <CardDescription>
+                Create a new account and click signup when you're done.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              <div className="space-y-1">
+                <Label htmlFor="name">Name</Label>
+                <Input id="name"
+                name="name"
+                value={signupInput.name} 
+                onChange={(e) => changeInputHandler(e,"signup")}  
+                placeholder="Eg. Dhoundiyal" 
+                required="true" />
+              </div>
+              <div className="space-y-1">
+                <Label htmlFor="username">Email</Label>
+                <Input type="email" 
+                name="email"
+                value={signupInput.email}
+                onChange={(e) => changeInputHandler(e,"signup")}
+                placeholder="Eg. ayushdh96@gmail.com" 
+                required="true" />
+              </div>
+              <div className="space-y-1">
+                <Label htmlFor="username">Password</Label>
+                <Input type="password"
+                name="password"
+                value={signupInput.password}
+                onChange={(e) => changeInputHandler(e,"signup")} 
+                placeholder="Strong Password" 
+                required="true" />
+              </div>
+            </CardContent>
+            <CardFooter>
+              <Button disabled={registerIsLoading} onClick={()=>handleRegistration("signup")}>
+              {
+                  registerIsLoading ? (
+                    <> <Loader2 className="mr-2 h-4 w-4 animate-spin"/> Please wait </>
+                  ) : "Signup"
+                }
+              </Button>
+            </CardFooter>
+          </Card>
+        </TabsContent>
+        <TabsContent value="login">
+          <Card>
+            <CardHeader>
+              <CardTitle>Login</CardTitle>
+              <CardDescription>
+                Login your password here. After signup only can you login here.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              <div className="space-y-1">
+                <Label htmlFor="current">Email</Label>
+                <Input type="email"
+                name="email"
+                value={loginInput.email} 
+                onChange={(e) => changeInputHandler(e,"login")}
+                placeholder="ayushdh96@gmail.com" 
+                required="true" />
+              </div>
+              <div className="space-y-1">
+                <Label htmlFor="new">Password</Label>
+                <Input type="password"
+                name="password"
+                value={loginInput.password} 
+                onChange={(e) => changeInputHandler(e,"login")}
+                placeholder="Strong Password" 
+                required="true" />
+              </div>
+            </CardContent>
+            <CardFooter>
+              <Button disabled={loginIsLoading} onClick={()=>handleRegistration("login")}>
+                {
+                  loginIsLoading ? (
+                    <> <Loader2 className="mr-2 h-4 w-4 animate-spin"/> Please wait </>
+                  ) : "Login"
+                }
+                </Button>
+            </CardFooter>
+          </Card>
+        </TabsContent>
+      </Tabs>
+    </div>
+
   )
 }
 
