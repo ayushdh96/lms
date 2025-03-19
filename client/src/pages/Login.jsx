@@ -52,17 +52,17 @@ const Login = () => {
 
   useEffect(() => {
     if(registerIsSuccess && registerData){
-      toast.success(resgisterData.message || "Signup successful")
+      toast.success(registerData.message || "Signup successful")
     }
     if(registerError){
-      toast.error(registerData.data.message || "Signup failed")
+      toast.error(registerError.data.message || "Signup failed")
     }
     if(loginIsSuccess && loginData){
       toast.success(loginData.message || "Login successful")
       navigate("/");
     }
     if(loginError){
-      toast.error(loginData.data.message || "login failed")
+      toast.error(loginError.data.message || "login failed")
     }
   },[loginIsLoading,registerIsLoading, loginData,registerData, loginError, registerError]);
   return (
