@@ -17,19 +17,14 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
-  origin:"http://localhost:8080",
+  origin:"http://localhost:5173",
   credentials:true
 }));
 //apis port http://localhost:8080/api/v1/user/register
 
 app.use("/api/v1/user", userRoute);
-app.get("/home",(_,res)=>{
-  res.status(200).json({
-    success:true,
-    message:"Hello I'm coming from backend"
-  })
-})
+
 
 app.listen(PORT, () => {
   console.log(`Server listen at port ${PORT}`); 
-})
+}) 
