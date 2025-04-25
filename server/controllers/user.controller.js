@@ -107,3 +107,16 @@ export const getUserProfile = async (req,res) => {
         })
     }
 }
+
+export const updateProfile = async (req,res) => {
+    try {
+        const userId = req.id;
+        
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            success:false,
+            message:"Failed to updateProfile"
+        })
+    }
+}
